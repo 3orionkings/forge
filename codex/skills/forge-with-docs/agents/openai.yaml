@@ -1,0 +1,6 @@
+interface:
+  display_name: "Forge With Docs"
+  short_description: "Plan against living domain documentation"
+  default_prompt: "Use $forge-with-docs to plan this change against the project glossary and ADRs before shared Forge execution."
+policy:
+  allow_implicit_invocation: true
