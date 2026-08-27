@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(?:mcp__forge__)?(?:forge_(?:preflight|start|status|wait|result|resume|steer|cancel|list))$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ./scripts/forge_workspace_hook.py",
+            "timeout": 5,
+            "statusMessage": "Binding Forge workspace"
+          }
+        ]
+      }
+    ]
+  }
+}
