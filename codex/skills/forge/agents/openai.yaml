@@ -1,0 +1,6 @@
+interface:
+  display_name: "Forge"
+  short_description: "Coordinate reviewed Codex and Claude builds"
+  default_prompt: "Use $forge to review and execute an implementation plan with Codex as the integration authority."
+policy:
+  allow_implicit_invocation: true
