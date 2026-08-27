@@ -1,0 +1,6 @@
+interface:
+  display_name: "Forge Review"
+  short_description: "Challenge plans before implementation"
+  default_prompt: "Use $forge-review to run a bounded adversarial review of this implementation plan."
+policy:
+  allow_implicit_invocation: true
