@@ -19,7 +19,7 @@ from forge_lib.service import ForgeService
 from forge_lib.protocol import _dispatch
 from forge_lib.state import Store
 from forge_lib.worker import WorkerError, run_worker
-from tests.admission_fixture import machine_headroom, seed_reconciled_base
+from tests.admission_fixture import machine_headroom, seed_wip_base
 
 
 RECOVERY_DISABLED_MESSAGE = "Automated Forge recovery is disabled in this build"
@@ -64,7 +64,7 @@ class RecoveryDisabledTests(unittest.TestCase):
             ["/usr/bin/git", "-C", str(self.repo), "commit", "-qm", "baseline"],
             check=True,
         )
-        seed_reconciled_base(self.repo)
+        seed_wip_base(self.repo)
 
     def service(self, label: str) -> ForgeService:
         return ForgeService(

@@ -171,7 +171,7 @@ class BridgeAdmissionTests(unittest.TestCase):
                 "-C",
                 str(self.repo),
                 "update-ref",
-                "refs/remotes/origin/launch/reconciled-base",
+                "refs/remotes/origin/HEAD",
                 self.head,
             ],
             check=True,
@@ -327,7 +327,7 @@ class BridgeAdmissionTests(unittest.TestCase):
                 "-C",
                 str(repository),
                 "update-ref",
-                "refs/remotes/origin/launch/reconciled-base",
+                "refs/remotes/origin/HEAD",
                 "HEAD",
             ],
             check=True,
@@ -1078,7 +1078,7 @@ class BridgeAdmissionTests(unittest.TestCase):
                         "-C",
                         str(self.repo),
                         "update-ref",
-                        "refs/remotes/origin/launch/reconciled-base",
+                        "refs/remotes/origin/HEAD",
                         self.head,
                     ],
                     check=True,
@@ -4060,8 +4060,8 @@ class BridgeAdmissionTests(unittest.TestCase):
         self.assertTrue(outcomes["codex-sol"].is_error, outcomes["codex-sol"])
         self.assertTrue(outcomes["mystery-model"].is_error, outcomes["mystery-model"])
 
-    def test_wip_uses_reconciled_launch_base_not_current_head(self):
-        reconciled_base = self.head
+    def test_wip_uses_the_remote_default_base_not_current_head(self):
+        wip_base = self.head
         subprocess.run(
             ["/usr/bin/git", "-C", str(self.repo), "commit", "--allow-empty", "-qm", "ahead"],
             check=True,
@@ -4078,8 +4078,8 @@ class BridgeAdmissionTests(unittest.TestCase):
                 "-C",
                 str(self.repo),
                 "update-ref",
-                "refs/remotes/origin/launch/reconciled-base",
-                reconciled_base,
+                "refs/remotes/origin/HEAD",
+                wip_base,
             ],
             check=True,
         )
@@ -4099,17 +4099,17 @@ class BridgeAdmissionTests(unittest.TestCase):
             "forge_start",
             self.arguments(
                 role="build",
-                key="reconciled-base-wip-cap",
+                key="remote-base-wip-cap",
                 admission=self.product_admission(),
             ),
         )
         self.assertTrue(result.is_error, result)
         self.assertIn("WIP_CAP", result.message)
 
-    def test_wip_requires_resolvable_reconciled_launch_base_for_every_lane(self):
-        reconciled_ref = "refs/remotes/origin/launch/reconciled-base"
+    def test_wip_requires_a_resolvable_remote_default_base_for_every_lane(self):
+        wip_ref = "refs/remotes/origin/HEAD"
         subprocess.run(
-            ["/usr/bin/git", "-C", str(self.repo), "update-ref", "-d", reconciled_ref],
+            ["/usr/bin/git", "-C", str(self.repo), "update-ref", "-d", wip_ref],
             check=True,
         )
         for index in range(11):
@@ -4125,14 +4125,13 @@ class BridgeAdmissionTests(unittest.TestCase):
                 check=True,
             )
 
-        reconciled_path = (
-            self.repo / ".git" / "refs" / "remotes" / "origin" / "launch"
-            / "reconciled-base"
+        wip_path = (
+            self.repo / ".git" / "refs" / "remotes" / "origin" / "HEAD"
         )
         for ref_state in ("missing", "unresolvable"):
             if ref_state == "unresolvable":
-                reconciled_path.parent.mkdir(parents=True, exist_ok=True)
-                reconciled_path.write_text("0" * 40 + "\n", encoding="ascii")
+                wip_path.parent.mkdir(parents=True, exist_ok=True)
+                wip_path.write_text("0" * 40 + "\n", encoding="ascii")
             for role in ("build", "recovery", "review"):
                 admission = (
                     self.review_admission()
@@ -4168,9 +4167,9 @@ class BridgeAdmissionTests(unittest.TestCase):
                     )
                     self.assertIn(expected_message, result.message.upper())
 
-    def test_derived_git_facts_use_absolute_tools_scrubbed_env_and_reconciled_base(self):
+    def test_derived_git_facts_use_absolute_tools_scrubbed_env_and_remote_default_base(self):
         calls = []
-        reconciled_base = "a" * 40
+        wip_base = "a" * 40
         branch_head = "b" * 40
 
         def completed(argv, **kwargs):
@@ -4178,7 +4177,7 @@ class BridgeAdmissionTests(unittest.TestCase):
             if "for-each-ref" in argv:
                 return subprocess.CompletedProcess(argv, 0, branch_head + "\n", "")
             if "rev-parse" in argv:
-                return subprocess.CompletedProcess(argv, 0, reconciled_base + "\n", "")
+                return subprocess.CompletedProcess(argv, 0, wip_base + "\n", "")
             if "rev-list" in argv:
                 return subprocess.CompletedProcess(argv, 0, "1\n", "")
             return subprocess.CompletedProcess(argv, 0, b"", b"")
@@ -4189,7 +4188,7 @@ class BridgeAdmissionTests(unittest.TestCase):
         self.assertTrue(all(Path(argv[0]).is_absolute() for argv, _ in calls))
         self.assertTrue(all("env" in kwargs for _, kwargs in calls))
         self.assertTrue(
-            any(f"{reconciled_base}..{branch_head}" in argv for argv, _ in calls)
+            any(f"{wip_base}..{branch_head}" in argv for argv, _ in calls)
         )
         self.assertTrue(
             all(

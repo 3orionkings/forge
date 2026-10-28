@@ -157,7 +157,11 @@ codex plugin add forge@forge
 
 Start a new session afterwards, and review and trust the plugin's hook in `/hooks`;
 without it the bridge refuses every call. Codex plugins cannot ship custom agents, so
-copy them yourself:
+copy them from a clone:
+
+```bash
+git clone https://github.com/3orionkings/forge.git
+```
 
 ```bash
 mkdir -p ~/.codex/agents && cp forge/codex/agents/*.toml ~/.codex/agents/
@@ -197,7 +201,7 @@ for PLAN.md".
 |---|---|
 | `.ai/EXECUTION_PROFILE.md` | `sprint` or `assured` for the repository; otherwise `assured` |
 | Project overlay | One `executor_policy=any`, `codex-only` or `claude-only` line binds product routing; with none, the build-wave workflow declares the global default `any` |
-| `FORGE_GUARD_WIP_BASE` | The branch the guard measures unmerged lane branches against. Without it the guard uses the repository's default branch (`origin/HEAD`, then `main` or `master`) and refuses a repository where none resolves |
+| `FORGE_GUARD_WIP_BASE` | The branch the guard measures unmerged lane branches against. Without it the guard uses the repository's default branch (`origin/HEAD`, then `main` or `master`) and refuses a repository where none resolves. Forge for Codex always measures against `origin/HEAD` and fails closed without it; `git remote set-head origin --auto` sets it |
 | `FORGE_SKILLS` | Where the agents find the skills and scripts. The plugin's hook sets it; a manual install defaults to `~/.claude/skills` |
 
 ## Tests
@@ -226,9 +230,9 @@ plugin packaging and the fixes below were added on October 28, 2026:
 
 - `skills/forge/references/acts-3-4.md` had lost the start of Act 3 and the end of
   Act 4 when the skill was split into references on August 3; the full text is back.
-- The dispatch guard measured unmerged branches against one project's integration
-  branch, so it refused every lane anywhere else. It now measures against the
-  repository's own default branch.
+- Both editions measured unmerged lane branches against one project's integration
+  branch, so they refused every lane in any other repository. They now measure
+  against the repository's own default branch.
 
 ## Credits
 

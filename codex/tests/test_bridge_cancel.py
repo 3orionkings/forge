@@ -16,7 +16,7 @@ from pathlib import Path
 from tests.admission_fixture import (
     machine_headroom,
     review_admission,
-    seed_reconciled_base,
+    seed_wip_base,
 )
 from unittest import mock
 
@@ -163,7 +163,7 @@ class BridgeCancelTests(unittest.TestCase):
         (repository / "tracked.txt").write_text("baseline\n", encoding="utf-8")
         subprocess.run(["git", "-C", str(repository), "add", "tracked.txt"], check=True)
         subprocess.run(["git", "-C", str(repository), "commit", "-qm", "baseline"], check=True)
-        seed_reconciled_base(repository)
+        seed_wip_base(repository)
         return repository.resolve(strict=True)
 
     def write_control(self, **updates):

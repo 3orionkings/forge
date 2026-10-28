@@ -24,7 +24,7 @@ from forge_lib import claude, contracts, service, worker  # noqa: E402
 from tests.admission_fixture import (
     machine_headroom,
     review_admission,
-    seed_reconciled_base,
+    seed_wip_base,
 )
 
 
@@ -1307,7 +1307,7 @@ class ProviderPolicyIntegrationTests(unittest.TestCase):
             ["git", "-C", str(repository), "commit", "-qm", "baseline"],
             check=True,
         )
-        seed_reconciled_base(repository)
+        seed_wip_base(repository)
         return repository
 
     def write_control(self, **updates):
@@ -1381,7 +1381,7 @@ class ProviderPolicyIntegrationTests(unittest.TestCase):
                 "-C",
                 str(self.repo),
                 "update-ref",
-                "refs/remotes/origin/launch/reconciled-base",
+                "refs/remotes/origin/HEAD",
                 head,
             ],
             check=True,

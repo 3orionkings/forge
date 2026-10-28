@@ -140,7 +140,7 @@ from forge_lib.state import StateError, Store, canonical_json  # noqa: E402
 from tests.admission_fixture import (  # noqa: E402
     machine_headroom,
     review_admission,
-    seed_reconciled_base,
+    seed_wip_base,
 )
 
 
@@ -1011,7 +1011,7 @@ class ForgeReviewSkillContractTests(unittest.TestCase):
                 ["git", "-C", str(repository), "commit", "-qm", "review baseline"],
                 check=True,
             )
-            seed_reconciled_base(repository)
+            seed_wip_base(repository)
             head = subprocess.run(
                 ["git", "-C", str(repository), "rev-parse", "HEAD"],
                 check=True,
@@ -2267,7 +2267,7 @@ class ForgeBuildSkillContractTests(unittest.TestCase):
                 ["git", "-C", str(repository), "commit", "-qm", "native baseline"],
                 check=True,
             )
-            seed_reconciled_base(repository)
+            seed_wip_base(repository)
             head = subprocess.run(
                 ["git", "-C", str(repository), "rev-parse", "HEAD"],
                 check=True,
@@ -3019,7 +3019,7 @@ raise SystemExit(proof.returncode)
                 ["git", "-C", str(repository), "commit", "-qm", "untracked baseline"],
                 check=True,
             )
-            seed_reconciled_base(repository)
+            seed_wip_base(repository)
             head = subprocess.run(
                 ["git", "-C", str(repository), "rev-parse", "HEAD"],
                 check=True,
@@ -3216,7 +3216,7 @@ raise SystemExit(proof.returncode)
                 ["git", "-C", str(repository), "commit", "-qm", "staged baseline"],
                 check=True,
             )
-            seed_reconciled_base(repository)
+            seed_wip_base(repository)
             head = subprocess.run(
                 ["git", "-C", str(repository), "rev-parse", "HEAD"],
                 check=True,
@@ -3405,7 +3405,7 @@ raise SystemExit(proof.returncode)
                 ["git", "-C", str(repository), "commit", "-qm", "build baseline"],
                 check=True,
             )
-            seed_reconciled_base(repository)
+            seed_wip_base(repository)
             head = subprocess.run(
                 ["git", "-C", str(repository), "rev-parse", "HEAD"],
                 check=True,
@@ -4292,7 +4292,7 @@ class ForgeOrchestrateSkillContractTests(unittest.TestCase):
                 ["git", "-C", str(repository), "commit", "-qm", "orchestration baseline"],
                 check=True,
             )
-            seed_reconciled_base(repository)
+            seed_wip_base(repository)
             head = subprocess.run(
                 ["git", "-C", str(repository), "rev-parse", "HEAD"],
                 check=True,
@@ -4996,7 +4996,7 @@ class ForgeWithDocsSkillContractTests(unittest.TestCase):
                 ["git", "-C", str(repository), "commit", "-qm", "domain baseline"],
                 check=True,
             )
-            seed_reconciled_base(repository)
+            seed_wip_base(repository)
             head = subprocess.run(
                 ["git", "-C", str(repository), "rev-parse", "HEAD"],
                 check=True,

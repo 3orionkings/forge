@@ -1318,15 +1318,17 @@ def _machine_snapshot() -> dict[str, float | int]:
 
 
 def _measured_wip(root: Path) -> int:
+    # Unmerged lane branches are measured against the remote's default branch;
+    # a repository where it does not resolve fails closed.
     try:
-        reconciled = subprocess.run(
+        base_ref = subprocess.run(
             [
                 _trusted_tool(GIT_EXECUTABLE, "Git"),
                 "-C",
                 str(root),
                 "rev-parse",
                 "--verify",
-                "refs/remotes/origin/launch/reconciled-base^{commit}",
+                "refs/remotes/origin/HEAD^{commit}",
             ],
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
@@ -1337,9 +1339,9 @@ def _measured_wip(root: Path) -> int:
             shell=False,
             env=_probe_environment(git=True),
         )
-        if reconciled.returncode != 0:
+        if base_ref.returncode != 0:
             raise OSError
-        measurement_base = reconciled.stdout.strip()
+        measurement_base = base_ref.stdout.strip()
         if re.fullmatch(
             r"[0-9a-fA-F]{40}|[0-9a-fA-F]{64}", measurement_base
         ) is None:

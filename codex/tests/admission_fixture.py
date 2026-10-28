@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 
 
-def seed_reconciled_base(repository: Path) -> None:
+def seed_wip_base(repository: Path) -> None:
     """Publish the canonical WIP base required by production admission."""
 
     subprocess.run(
@@ -15,7 +15,7 @@ def seed_reconciled_base(repository: Path) -> None:
             "-C",
             str(repository),
             "update-ref",
-            "refs/remotes/origin/launch/reconciled-base",
+            "refs/remotes/origin/HEAD",
             "HEAD",
         ],
         check=True,

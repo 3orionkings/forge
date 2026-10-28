@@ -16,7 +16,7 @@ from pathlib import Path
 from tests.admission_fixture import (
     machine_headroom,
     review_admission,
-    seed_reconciled_base,
+    seed_wip_base,
 )
 from unittest import mock
 
@@ -120,7 +120,7 @@ class BridgeJobTests(unittest.TestCase):
             ["git", "-C", str(self.repo), "commit", "-qm", "baseline"],
             check=True,
         )
-        seed_reconciled_base(self.repo)
+        seed_wip_base(self.repo)
 
         self.state_path = self.temp_path / "state" / "state.sqlite3"
         self.argv_log = self.temp_path / "argv.jsonl"
@@ -185,7 +185,7 @@ class BridgeJobTests(unittest.TestCase):
             ["git", "-C", str(repository), "commit", "-qm", "baseline"],
             check=True,
         )
-        seed_reconciled_base(repository)
+        seed_wip_base(repository)
         return repository
 
     def make_service(self, *, launch_workspace=None, state_path=None):
@@ -431,7 +431,7 @@ class BridgeJobTests(unittest.TestCase):
         (other / "other.txt").write_text("other\n", encoding="utf-8")
         subprocess.run(["git", "-C", str(other), "add", "other.txt"], check=True)
         subprocess.run(["git", "-C", str(other), "commit", "-qm", "other"], check=True)
-        seed_reconciled_base(other)
+        seed_wip_base(other)
 
         second = self.bridge(launch_workspace=other)
         other_start = second.tool(
