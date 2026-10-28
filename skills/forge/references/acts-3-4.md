@@ -10,6 +10,28 @@
 > execution procedure for that cadence.**
 
 
+## ACT 3/4 — EXECUTION (complexity-routed; runs inside this skill)
+
+Once the plan is APPROVED (Gate 1) and you've signed off, **assess complexity** per
+`ENGINE.md` §5. A simple product build proceeds single-track on the default executor
+(Sol 5.6 @ ultra) when the dispatch guard admits it. A complex build presents Gate 2's
+routing/concurrency proposal — argued by both models, one line of reasoning per unit —
+and waits. The user can adjust, stop, require serialization, or re-route any unit to
+either side; no destination is forbidden to them.
+
+Then run **Act 3** (simple) or **Act 4** (complex) directly below. Commands come from
+`ENGINE.md` §4; don't reconstruct them.
+
+### ACT 3 — BUILD (simple / narrow: single-track on the proposed executor)
+
+For a small fix, single-system change, or mechanical migration. Tunables:
+`SPEC_FILE=PLAN.md` · `MAX_FIX_ROUNDS=2` · `EXEC_LOG=PLAN-EXECUTION-LOG.md` ·
+`PROOF_CMD` (from the plan; if absent, ask one question). `$ROUTE` defaults to
+Sol 5.6 @ ultra; a single-track build that the plan routed elsewhere sets `$ROUTE`
+(or dispatches the Claude-side executor) accordingly and logs the one-line reason in
+`LOG_FILE` before the freeze. After freezing, all runtime entries go to `EXEC_LOG`.
+
+1. **Build contract → temp file `$P`** (never inline-quote): GOAL · SPEC (read
    `SPEC_FILE`, implement exactly, report deviations not redesigns) · IMMUTABLE
    BASE SHA · BACKLOG ITEM IDs · EXACT DECLARED FILE SET · CONSTRAINTS · NON-GOALS ·
    PROOF COMMAND · WORK-LOG PATH · REPORT PATH · OUTPUT (files-changed report +
@@ -90,3 +112,36 @@ Tunables: `SPEC_FILE=PLAN.md` · `EXEC_LOG=PLAN-EXECUTION-LOG.md` ·
    active lanes total:
    - **Codex-side unit** → `ROUTE="$SOL_ROUTE"` (or the Gate-2-approved Codex route);
      run Act 3's build steps (ENGINE.md §4c/§4d) in that worktree;
+     `run_in_background: true`; `🔔 EXECUTOR FINISHED …` on completion.
+   - **Claude-side unit** → dispatch a subagent at the routed model (default Fable 5)
+     into that worktree with the same contract shape: immutable base SHA, exact
+     declared file set, proof command, work-log path, report path, and **no commit
+     authority**.
+   Only one HEAVY lane may hold the machine-wide heavy/gate lease. Reading,
+   patching, typechecking, linting, tests, and builds do not overlap freely.
+7. **Review + succession receipts (every unit).** Review is **cross-model by
+   construction: the reviewer is whichever side did not execute the unit.** Codex-executed
+   work → the Claude-side orchestrator reads the complete diff and reruns proof.
+   Claude-executed work → Codex/Sol reviews read-only (template 4a) *and* the
+   orchestrator still reruns proof itself, because proof rerun is an
+   orchestrator duty, not a reviewer duty. A same-model subagent review is not
+   cross-model review — that substitution is how 0 of 23 review claims survived
+   scrutiny on 2026-07-28. Before any successor starts, the predecessor must have both
+   a report-consumption receipt and a cross-model review receipt containing reviewer
+   identity, thread id, and `APPROVED` verdict; pass both to the guard. Failures return
+   to the **same** builder up to `MAX_FIX_ROUNDS`, then re-route by the logged rules in
+   step 5 of Act 3.
+8. **Integrate.** The Claude-side orchestrator assembles passing units in dependency
+   order, writes `.ai/HANDOFF.md` once in the uncommitted integration candidate, reads
+   the complete combined diff, and reruns the integrated proof/full gate over that exact
+   candidate. Only then does it commit, merge, and push autonomously. No executor —
+   Codex or Claude — commits or merges; unit lanes never edit HANDOFF.
+9. **Completion record.** Present per-unit summaries + combined diff summary +
+   current-run integrated proof + deviations. There is no owner Gate 3; Claude's
+   merge autonomy begins only after its complete-diff review and successful proof
+   rerun.
+
+> The four acts above run end-to-end inside `/forge`. Each is **also** a standalone
+> skill for when you want just one piece — `/forge-review` (Act 2), `/forge-build`
+> (Act 3), `/forge-orchestrate` (Act 4), `/forge-with-docs` (docs-aware Act 1) — and
+> they share this same `ENGINE.md`, so behavior is identical whichever door you enter.
