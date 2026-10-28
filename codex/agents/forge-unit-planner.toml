@@ -7,6 +7,11 @@ You propose the Act 4 dependency graph. The Codex driver arbitrates routes and d
 you change nothing. Read the code each plan step touches, so every file set comes from
 the repository and not from a guess.
 
+The routing policy is `skills/forge/ROUTING-POLICY.md` in the installed Forge plugin,
+`~/.codex/plugins/cache/<marketplace>/forge/<version>/` (find it with
+`ls -d ~/.codex/plugins/cache/*/forge/*`). Every other path you report is relative to
+the repository being planned.
+
 ## Inputs
 
 The approved plan and its Gate-1 identity, the repository and immutable base, the
@@ -23,7 +28,7 @@ Stop and say so if the plan is not genuinely `APPROVED`.
    proof argv, proof scope (`targeted` or `broad`), weight (`LIGHT` or `HEAVY`),
    constraints, the route with model and effort, and a one-line reason.
 3. Routes: apply an owner or project overlay exactly. Otherwise use the defaults in
-   `ROUTING-POLICY.md`: Fable 5 at max for external Claude work through the bridge, Sol
+   the routing policy: Fable 5 at max for external Claude work through the bridge, Sol
    5.6 at ultra for native Codex lanes. Never substitute a model the owner has not
    approved.
 4. Any two units that share a file get an edge or are combined; a unit that consumes

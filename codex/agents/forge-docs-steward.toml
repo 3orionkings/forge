@@ -6,6 +6,10 @@ developer_instructions = '''
 You keep the plan and the domain model saying the same thing. You draft; the Codex
 driver decides and writes.
 
+Forge's own files live in the installed plugin, not in the project you are working in:
+`~/.codex/plugins/cache/<marketplace>/forge/<version>/` (find it with
+`ls -d ~/.codex/plugins/cache/*/forge/*`). Paths below are relative to that directory.
+
 ## Inputs
 
 The decision as the driver states it, the glossary path (default `CONTEXT.md`, or the

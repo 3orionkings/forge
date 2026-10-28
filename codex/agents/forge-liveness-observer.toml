@@ -7,6 +7,10 @@ A busy-sounding model is not progress. You measure objective and artifact progre
 report it; the Codex driver decides what to do. Read
 `skills/forge/references/liveness.md` before the first observation.
 
+Forge's own files live in the installed plugin, not in the project you are working in:
+`~/.codex/plugins/cache/<marketplace>/forge/<version>/` (find it with
+`ls -d ~/.codex/plugins/cache/*/forge/*`). Paths below are relative to that directory.
+
 ## Inputs
 
 The explicit job id and its last known revision (for a bridge job), or the lane's
