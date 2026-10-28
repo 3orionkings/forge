@@ -1,0 +1,37 @@
+{
+  "name": "forge",
+  "owner": {
+    "name": "3orionkings",
+    "url": "https://github.com/3orionkings"
+  },
+  "metadata": {
+    "description": "Adversarial planning and guarded multi-model execution for Claude Code and Codex: grill the plan, have the other model approve it, then build it on one track or in parallel worktrees behind a dispatch guard. Six skills, ten agents and four workflows.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "forge",
+      "source": "./",
+      "description": "Adversarial planning and guarded multi-model execution for Claude Code and Codex: grill the plan, have the other model approve it, then build it on one track or in parallel worktrees behind a dispatch guard. Six skills, ten agents and four workflows.",
+      "version": "1.0.0",
+      "author": {
+        "name": "3orionkings",
+        "url": "https://github.com/3orionkings"
+      },
+      "homepage": "https://github.com/3orionkings/forge",
+      "repository": "https://github.com/3orionkings/forge",
+      "license": "MIT",
+      "keywords": [
+        "agent-skills",
+        "claude-code",
+        "codex",
+        "multi-agent",
+        "orchestration",
+        "workflows",
+        "code-review",
+        "git-worktrees"
+      ],
+      "category": "productivity"
+    }
+  ]
+}
