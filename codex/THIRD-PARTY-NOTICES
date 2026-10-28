@@ -1,0 +1,9 @@
+Forge third-party notice compatibility pointer
+===============================================
+
+The canonical and comprehensive third-party notice for Forge is
+`THIRD-PARTY-NOTICES.md`.
+
+This extensionless file is retained only for compatibility with existing
+dispatch-guard and packaging references. Update `THIRD-PARTY-NOTICES.md`; do not
+duplicate provenance here.

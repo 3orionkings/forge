@@ -1,0 +1,39 @@
+{
+  "name": "forge",
+  "version": "0.1.0",
+  "description": "Coordinate role-reversed Codex and Claude planning, review, execution, and orchestration; recovery requests fail closed.",
+  "author": {
+    "name": "3orionkings",
+    "url": "https://github.com/3orionkings"
+  },
+  "homepage": "https://github.com/3orionkings/forge",
+  "repository": "https://github.com/3orionkings/forge",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "claude",
+    "orchestration",
+    "review",
+    "execution"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Forge",
+    "shortDescription": "Coordinate reviewed Codex and Claude builds",
+    "longDescription": "Codex remains plan arbiter, verifier, integrator, and commit authority while Claude performs bounded review/execution via local stdio.",
+    "developerName": "3orionkings",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Grill and lock a Forge plan.",
+      "Review this plan with Claude.",
+      "Build and verify a frozen unit."
+    ],
+    "websiteURL": "https://github.com/3orionkings/forge"
+  },
+  "mcpServers": "./.mcp.json"
+}

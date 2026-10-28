@@ -1,0 +1,6 @@
+interface:
+  display_name: "Forge Orchestrate"
+  short_description: "Coordinate approved multi-model build units"
+  default_prompt: "Use $forge-orchestrate to execute this approved complex plan across isolated Codex and Claude lanes."
+policy:
+  allow_implicit_invocation: true
