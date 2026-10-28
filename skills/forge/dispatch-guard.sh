@@ -1227,10 +1227,27 @@ fi
 # itself from the worktree's repository rather than trusting a caller-typed
 # count (a hard-coded count admitted a lane against stale WIP on 2026-08-01).
 # Scope rule matches the tracker: refs/heads matching ^(opus|sol|fable)/ with
-# at least one commit not reachable from the WIP base. The base defaults to
-# origin/launch/reconciled-base and may be overridden for tests via
-# FORGE_GUARD_WIP_BASE; FORGE_GUARD_WIP_MEASURED overrides only when the
-# worktree has no resolvable repository (declared in the test suite).
+# at least one commit not reachable from the WIP base. The base is
+# FORGE_GUARD_WIP_BASE when set, otherwise the repository's own default branch:
+# origin/HEAD, then a local main or master. A base that does not resolve still
+# refuses the lane. FORGE_GUARD_WIP_MEASURED overrides only when the worktree
+# has no resolvable repository (declared in the test suite).
+default_wip_base() {
+  local repo="$1" candidate
+  candidate="$(git -C "${repo}" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null)"
+  if [[ -n "${candidate}" ]]; then
+    print -r -- "${candidate}"
+    return 0
+  fi
+  for candidate in main master; do
+    if git -C "${repo}" rev-parse --verify --quiet "refs/heads/${candidate}^{commit}" >/dev/null 2>&1; then
+      print -r -- "${candidate}"
+      return 0
+    fi
+  done
+  print -r -- "origin/HEAD"
+}
+
 measure_unmerged_branches() {
   local repo="$1" base="$2" count=0 line branch_sha ahead
   if [[ -n "${FORGE_GUARD_WIP_MEASURED:-}" ]]; then
@@ -1246,7 +1263,7 @@ measure_unmerged_branches() {
   print -r -- "${count}"
 }
 
-typeset WIP_BASE="${FORGE_GUARD_WIP_BASE:-origin/launch/reconciled-base}"
+typeset WIP_BASE="${FORGE_GUARD_WIP_BASE:-$(default_wip_base "${WORKTREE}")}"
 typeset MEASURED_WIP=""
 MEASURED_WIP="$(measure_unmerged_branches "${WORKTREE}" "${WIP_BASE}")" ||
   reject "WIP_UNMEASURABLE" "cannot measure WIP: base ${WIP_BASE} is not resolvable from ${WORKTREE}; a lane may not launch on an unmeasured repository"

@@ -145,7 +145,9 @@ invoke_guard() {
   # CP-2: cases declare their WIP via --unmerged-branches; the harness mirrors
   # that declaration into the measured channel so the guard's declared-vs-
   # measured cross-check holds for every legacy case. Dedicated CP-2 cases
-  # override CASE_WIP_MEASURED to exercise mismatch and self-measurement.
+  # override CASE_WIP_MEASURED to exercise mismatch and self-measurement, and
+  # CASE_WIP_SELF_MEASURE lets the guard measure a real repository itself
+  # (CASE_WIP_BASE empty means the guard's own default-branch resolution).
   local -a args=("$@")
   local wip_measured="${CASE_WIP_MEASURED:-}"
   if [[ -z "${wip_measured}" ]]; then
@@ -156,7 +158,13 @@ invoke_guard() {
       fi
     done
   fi
-  FORGE_GUARD_WIP_MEASURED="${wip_measured:-0}" \
+  local -a wip_env
+  if [[ -n "${CASE_WIP_SELF_MEASURE:-}" ]]; then
+    wip_env=(-u FORGE_GUARD_WIP_MEASURED "FORGE_GUARD_WIP_BASE=${CASE_WIP_BASE:-}")
+  else
+    wip_env=("FORGE_GUARD_WIP_MEASURED=${wip_measured:-0}")
+  fi
+  env "${wip_env[@]}" \
   FORGE_GUARD_LOAD_1="${CASE_LOAD_1}" \
   FORGE_GUARD_FREE_SWAP_GB="${CASE_FREE_SWAP_GB}" \
   FORGE_GUARD_CORE_COUNT="${CASE_CORE_COUNT}" \
@@ -1220,6 +1228,63 @@ assert_rejected \
   "an unknown proof scope is refused" \
   "FIELD_PROOF_SCOPE" \
   "${COMMON_ARGS[@]}" --verdict APPROVED --proof-scope narrow
+
+# ============================================================================
+# CP-2 WIP base resolution (2026-10-28). With no FORGE_GUARD_WIP_BASE the guard
+# measures against the repository's own default branch (origin/HEAD, then main
+# or master) instead of one project's integration branch, and still refuses a
+# repository where no base resolves. Only opus/, sol/ and fable/ branches count.
+readonly TEST_WIP_REPO="${TEST_TMP}/wip-repo"
+mkdir -p "${TEST_WIP_REPO}/scripts" || exit 1
+git -C "${TEST_WIP_REPO}" init -q -b main || exit 1
+git -C "${TEST_WIP_REPO}" config user.name 'Forge Guard Test' || exit 1
+git -C "${TEST_WIP_REPO}" config user.email 'forge-guard@example.invalid' || exit 1
+print -r -- 'fixture' > "${TEST_WIP_REPO}/scripts/cp1.txt"
+git -C "${TEST_WIP_REPO}" add scripts/cp1.txt || exit 1
+git -C "${TEST_WIP_REPO}" commit -qm 'wip fixture base' || exit 1
+readonly TEST_WIP_BASE_SHA="$(git -C "${TEST_WIP_REPO}" rev-parse HEAD)" || exit 1
+git -C "${TEST_WIP_REPO}" branch fable/at-base || exit 1
+git -C "${TEST_WIP_REPO}" checkout -q -b sol/ahead || exit 1
+git -C "${TEST_WIP_REPO}" commit --allow-empty -qm 'unmerged unit' || exit 1
+git -C "${TEST_WIP_REPO}" checkout -q -b feature/out-of-scope || exit 1
+git -C "${TEST_WIP_REPO}" commit --allow-empty -qm 'not a forge lane branch' || exit 1
+git -C "${TEST_WIP_REPO}" checkout -q main || exit 1
+
+typeset -a WIP_REPO_ARGS
+WIP_REPO_ARGS=("${BASE_ARGS[@]}" --worktree "${TEST_WIP_REPO}" --base-sha "${TEST_WIP_BASE_SHA}")
+CASE_WIP_SELF_MEASURE="1"
+CASE_WIP_BASE=""
+assert_admitted \
+  "WIP is measured against main when no base is configured" \
+  "${WIP_REPO_ARGS[@]}" --unmerged-branches 1
+assert_rejected \
+  "a declared WIP count that disagrees with the count measured against main" \
+  "measured count 1 (base main)" \
+  "${WIP_REPO_ARGS[@]}" --unmerged-branches 0
+
+readonly TEST_WIP_CLONE="${TEST_TMP}/wip-clone"
+git clone -q "${TEST_WIP_REPO}" "${TEST_WIP_CLONE}" || exit 1
+git -C "${TEST_WIP_CLONE}" branch opus/local-unit origin/sol/ahead || exit 1
+assert_rejected \
+  "the remote default branch is the WIP base in a clone" \
+  "measured count 1 (base origin/main)" \
+  "${BASE_ARGS[@]}" --worktree "${TEST_WIP_CLONE}" --base-sha "${TEST_WIP_BASE_SHA}" \
+  --unmerged-branches 0
+
+readonly TEST_WIP_TRUNK="${TEST_TMP}/wip-trunk"
+mkdir -p "${TEST_WIP_TRUNK}/scripts" || exit 1
+git -C "${TEST_WIP_TRUNK}" init -q -b trunk || exit 1
+git -C "${TEST_WIP_TRUNK}" config user.name 'Forge Guard Test' || exit 1
+git -C "${TEST_WIP_TRUNK}" config user.email 'forge-guard@example.invalid' || exit 1
+print -r -- 'fixture' > "${TEST_WIP_TRUNK}/scripts/cp1.txt"
+git -C "${TEST_WIP_TRUNK}" add scripts/cp1.txt || exit 1
+git -C "${TEST_WIP_TRUNK}" commit -qm 'trunk fixture base' || exit 1
+assert_rejected \
+  "a repository with no resolvable WIP base is refused" \
+  "WIP_UNMEASURABLE" \
+  "${BASE_ARGS[@]}" --worktree "${TEST_WIP_TRUNK}" \
+  --base-sha "$(git -C "${TEST_WIP_TRUNK}" rev-parse HEAD)" --unmerged-branches 0
+CASE_WIP_SELF_MEASURE=""
 
 if (( FAILURES == 0 )); then
   print -r -- "PASS: ${CASES} dispatch-guard cases"
