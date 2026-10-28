@@ -63,7 +63,7 @@ constraint, do it. If not, name the single specific thing the owner must free.
 ## Recording it
 
 ```bash
-WD=~/.claude/skills/forge-recovery/recovery-watchdog.sh
+WD="${FORGE_SKILLS:-$HOME/.claude/skills}/forge-recovery/recovery-watchdog.sh"   # FORGE_SKILLS: plugin installs
 $WD handoff --run "$RUN" --unit R1 --detail "REPEAT: 2 fails; packet /tmp/handoff-R1.md"
 ```
 

@@ -40,7 +40,7 @@ Full mechanics, gates and per-act procedure:
 nothing landed.
 
 ```bash
-WD=~/.claude/skills/forge-recovery/recovery-watchdog.sh
+WD="${FORGE_SKILLS:-$HOME/.claude/skills}/forge-recovery/recovery-watchdog.sh"   # FORGE_SKILLS: plugin installs
 $WD init     --run "$RUN" --unit R1 --owner <side> --peer <side> --objective "units landed"
 $WD attempt  --run "$RUN" --unit R1 --result pass|fail --detail "<verbatim failure>"
 $WD progress --run "$RUN" --unit R1 --evidence "<what objectively moved>"

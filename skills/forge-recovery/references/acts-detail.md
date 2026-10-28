@@ -19,7 +19,7 @@ healthy.
 
 ```bash
 RUN=recovery-$(date +%Y%m%d)      # stamp once; reuse all run
-WD=~/.claude/skills/forge-recovery/recovery-watchdog.sh
+WD="${FORGE_SKILLS:-$HOME/.claude/skills}/forge-recovery/recovery-watchdog.sh"   # FORGE_SKILLS: plugin installs
 $WD init --run "$RUN" --unit R1 --owner sol --peer claude --role executor --objective "units landed"
 $WD attempt  --run "$RUN" --unit R1 --result fail --detail "<verbatim failing command + tail>"
 $WD progress --run "$RUN" --unit R1 --evidence "<hash/proof/commit proving the objective moved>"

@@ -1,7 +1,8 @@
 # Forge recovery playbook — load only for a wrecked run
 
 **Load only after `/forge-recovery` detects a real wreck signal:**
-> Read `~/.claude/skills/forge-recovery/PLAYBOOK.md` and execute it throughout this session.
+> Read `~/.claude/skills/forge-recovery/PLAYBOOK.md` (or `$FORGE_SKILLS/forge-recovery/PLAYBOOK.md`
+> when Forge is installed as a plugin) and execute it throughout this session.
 
 Rules an orchestrator must follow during **recovery and rejoin**. A healthy Forge run
 uses `../forge/SKILL.md` and must not load this playbook pre-emptively. Each rule is here because
