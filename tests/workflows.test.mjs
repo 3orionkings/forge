@@ -182,6 +182,8 @@ function waveResponder(options = {}) {
       state.executions++
       const id = call.prompt.match(/unit: (\S+)/)[1]
       if (options.expand === id && !call.prompt.includes('extra.ts')) return { status: 'EXPANSION_REQUEST', changed_files: [], proof_exit: '', expansion_files: ['extra.ts'], expansion_reason: 'needs helper' }
+      if (options.expandSame === id) return { status: 'EXPANSION_REQUEST', changed_files: [], proof_exit: '', expansion_files: ['a.ts'], expansion_reason: 'already declared' }
+      if (options.expandForever === id) return { status: 'EXPANSION_REQUEST', changed_files: [], proof_exit: '', expansion_files: [`more-${state.executions}.ts`], expansion_reason: 'one more file' }
       return { status: 'DONE', thread_id: t === 'forge-codex-executor' ? `TH-${id}` : '', changed_files: [], proof_exit: '0' }
     }
     if (t === 'forge-unit-verifier') {
@@ -241,6 +243,20 @@ await check('build wave: an expansion request is re-admitted in the same lane', 
   assert.deepEqual(expand.files, ['a.ts', 'extra.ts'])
   assert.equal(expand.clean_tree, false)
   assert.ok(expand.active_writer_worktrees.includes('/wt/a'), 'expanding writer lists itself as the active writer')
+})
+await check('build wave: an expansion that names no new path is blocked, not looped', async () => {
+  const { state, respond } = waveResponder({ expandSame: 'a' })
+  const { value } = await run('forge-build-wave', waveArgs([wunit('a', ['a.ts'])]), respond)
+  assert.equal(value.units[0].status, 'BLOCKED')
+  assert.match(value.units[0].problem, /no new path/)
+  assert.equal(state.admissions.filter(d => d.action === 'expand').length, 0)
+})
+await check('build wave: endless expansion requests stop after three', async () => {
+  const { state, respond } = waveResponder({ expandForever: 'a' })
+  const { value } = await run('forge-build-wave', waveArgs([wunit('a', ['a.ts'])]), respond)
+  assert.equal(value.units[0].status, 'BLOCKED')
+  assert.match(value.units[0].problem, /more than three expansions/)
+  assert.equal(state.admissions.filter(d => d.action === 'expand').length, 3)
 })
 await check('build wave: sprint fix round reuses the lane; assured re-freezes and re-admits', async () => {
   for (const profile of ['sprint', 'assured']) {

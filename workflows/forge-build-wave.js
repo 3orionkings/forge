@@ -410,8 +410,13 @@ async function runUnit(u) {
     if (launch.result !== 'ADMIT') return { ...result, status: 'REJECTED', problem: launch.guard_output }
 
     let run = await execute(u, prep, launch.guard_output, files, null)
+    let expansions = 0
     while (run && run.status === 'EXPANSION_REQUEST' && Array.isArray(run.expansion_files)) {
       const widened = [...new Set([...files, ...run.expansion_files])]
+      // A request that adds no path, or a fourth widening, goes back to the driver: the
+      // plan's file sets were wrong, and re-admitting in a loop would hide that.
+      if (widened.length === files.length) return { ...result, status: 'BLOCKED', problem: 'the expansion request named no new path', run }
+      if (++expansions > 3) return { ...result, status: 'BLOCKED', problem: 'more than three expansions; re-plan the unit', run }
       const expansion = await admit(u, prep, 'expand', widened, files)
       result.admissions.push(expansion.guard_output)
       if (expansion.result !== 'ADMIT') return { ...result, status: 'BLOCKED', problem: `expansion refused: ${expansion.guard_output}`, run }

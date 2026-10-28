@@ -211,7 +211,7 @@ for PLAN.md".
 | Dispatch guard | `zsh skills/forge/dispatch-guard.test.sh` | 139 |
 | Context policy | `zsh skills/forge/context-policy.test.sh` | 22 |
 | Recovery watchdog | `zsh skills/forge-recovery/recovery-watchdog.test.sh` | 37 |
-| Workflows, mocked agents | `node tests/workflows.test.mjs` | 19 |
+| Workflows, mocked agents | `node tests/workflows.test.mjs` | 21 |
 | Workflows against the real guard | `node tests/workflow-admission.test.mjs` | 5 |
 | Forge for Codex, offline gate | `bash codex/scripts/run_offline_gate.sh` | 582 Python tests and three shell suites |
 
