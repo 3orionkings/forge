@@ -1,16 +1,6 @@
 MIT License
 
-The /forge skill pack (forge, forge-review, forge-build, forge-with-docs,
-forge-orchestrate) is an adaptation for the user's Codex GPT-5.6 "Sol" setup and
-multi-model orchestration.
-
-It is derived from:
-- grill-me-codex, grill-with-docs-codex, codex-review, codex-build — Copyright (c)
-  2026 Chase AI (https://github.com/chaseai-yt/grill-me-codex), MIT License.
-- grill-me / grill-with-docs (the "grill" Act 1, and CONTEXT-FORMAT.md /
-  ADR-FORMAT.md) — Copyright (c) 2026 Matt Pocock
-  (https://github.com/mattpocock/skills), MIT License.
-- the codex-first flipped-execution pattern — Peter Steinberger.
+Copyright (c) 2026 Emmanuel Benami
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
